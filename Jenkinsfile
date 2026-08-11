@@ -86,14 +86,35 @@ pipeline {
             }
         }
 
-        stage('Allure Report') {
+        stage('Generate Allure HTML') {
             steps {
-                echo '===== PUBLISHING ALLURE REPORT ====='
+                echo '===== GENERATING ALLURE HTML REPORT ====='
 
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    results: [[path: 'allure-results-all']]
+                sh '''
+                    rm -rf allure-report
+
+                    allure generate allure-results-all \
+                        --clean \
+                        -o allure-report
+
+                    echo "===== ALLURE HTML GENERATED ====="
+                    ls -la allure-report
+                '''
+            }
+        }
+
+        stage('Publish HTML Report') {
+            steps {
+                echo '===== PUBLISHING HTML REPORT ====='
+
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'allure-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Allure Report',
+                    reportTitles: 'Smplifai Automation Report'
                 ])
             }
         }
@@ -105,7 +126,7 @@ pipeline {
             echo '========================================'
             echo 'PIPELINE SUCCESS'
             echo 'Smoke + Regression + E2E completed'
-            echo 'Allure Report published'
+            echo 'Allure HTML Report published'
             echo '========================================'
         }
 
@@ -117,6 +138,10 @@ pipeline {
         }
 
         always {
+            archiveArtifacts artifacts: 'allure-report/**/*',
+                             allowEmptyArchive: true,
+                             fingerprint: true
+
             echo 'Pipeline finished.'
         }
     }
