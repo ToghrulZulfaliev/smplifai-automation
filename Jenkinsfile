@@ -13,13 +13,8 @@ pipeline {
                 echo '===== ENVIRONMENT CHECK ====='
 
                 sh '''
-                    echo "Java:"
                     java -version
-
-                    echo "Maven:"
                     mvn -version
-
-                    echo "Allure:"
                     allure --version
                 '''
             }
@@ -34,7 +29,6 @@ pipeline {
 
                     rm -rf allure-results-smoke
                     mkdir -p allure-results-smoke
-
                     cp -R target/allure-results/. allure-results-smoke/
                 '''
 
@@ -51,7 +45,6 @@ pipeline {
 
                     rm -rf allure-results-regression
                     mkdir -p allure-results-regression
-
                     cp -R target/allure-results/. allure-results-regression/
                 '''
 
@@ -68,7 +61,6 @@ pipeline {
 
                     rm -rf allure-results-e2e
                     mkdir -p allure-results-e2e
-
                     cp -R target/allure-results/. allure-results-e2e/
                 '''
 
@@ -88,7 +80,6 @@ pipeline {
                     cp -R allure-results-regression/. allure-results-all/
                     cp -R allure-results-e2e/. allure-results-all/
 
-                    echo "Allure result files:"
                     ls -la allure-results-all
                 '''
             }
@@ -104,8 +95,6 @@ pipeline {
                     allure generate allure-results-all \
                         --clean \
                         -o allure-report
-
-                    echo "===== ALLURE REPORT GENERATED ====="
 
                     ls -la allure-report
                 '''
