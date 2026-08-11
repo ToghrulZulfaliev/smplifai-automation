@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     environment {
@@ -85,29 +86,15 @@ pipeline {
             }
         }
 
-        stage('Generate Allure Report') {
+        stage('Allure Report') {
             steps {
-                echo '===== GENERATING ALLURE REPORT ====='
+                echo '===== PUBLISHING ALLURE REPORT ====='
 
-                sh '''
-                    rm -rf allure-report
-
-                    allure generate allure-results-all \
-                        --clean \
-                        -o allure-report
-
-                    echo "===== ALLURE REPORT GENERATED ====="
-                    ls -la allure-report
-                '''
-            }
-        }
-
-        stage('Archive Allure Report') {
-            steps {
-                echo '===== ARCHIVING ALLURE REPORT ====='
-
-                archiveArtifacts artifacts: 'allure-report/**',
-                                 fingerprint: true
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'allure-results-all']]
+                ])
             }
         }
     }
@@ -118,7 +105,7 @@ pipeline {
             echo '========================================'
             echo 'PIPELINE SUCCESS'
             echo 'Smoke + Regression + E2E completed'
-            echo 'Allure Report generated and archived'
+            echo 'Allure Report published'
             echo '========================================'
         }
 
