@@ -1,0 +1,28 @@
+# Maven
+target/
+
+# Allure
+allure-report/
+allure-results/
+allure-results-*/
+allure-results-all/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Cucumber reports
+target/cucumber-reports/
+
+# Surefire
+target/surefire-reports/
+
+# Temporary files
+*.tmp
+*.swp
