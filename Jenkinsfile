@@ -10,6 +10,7 @@ pipeline {
         stage('Environment Check') {
             steps {
                 echo '===== ENVIRONMENT CHECK ====='
+
                 sh '''
                     java -version
                     mvn -version
@@ -21,6 +22,7 @@ pipeline {
         stage('Smoke Test') {
             steps {
                 echo '===== SMOKE TEST START ====='
+
                 sh '''
                     mvn clean test -Dtest=runner.SmokeRunner
 
@@ -28,6 +30,7 @@ pipeline {
                     mkdir -p allure-results-smoke
                     cp -R target/allure-results/. allure-results-smoke/
                 '''
+
                 echo '===== SMOKE TEST FINISHED ====='
             }
         }
@@ -35,6 +38,7 @@ pipeline {
         stage('Regression Test') {
             steps {
                 echo '===== REGRESSION TEST START ====='
+
                 sh '''
                     mvn clean test -Dtest=runner.RegressionRunner
 
@@ -42,6 +46,7 @@ pipeline {
                     mkdir -p allure-results-regression
                     cp -R target/allure-results/. allure-results-regression/
                 '''
+
                 echo '===== REGRESSION TEST FINISHED ====='
             }
         }
@@ -49,6 +54,7 @@ pipeline {
         stage('E2E Test') {
             steps {
                 echo '===== E2E TEST START ====='
+
                 sh '''
                     mvn clean test -Dtest=runner.E2ERunner
 
@@ -56,6 +62,7 @@ pipeline {
                     mkdir -p allure-results-e2e
                     cp -R target/allure-results/. allure-results-e2e/
                 '''
+
                 echo '===== E2E TEST FINISHED ====='
             }
         }
@@ -63,6 +70,7 @@ pipeline {
         stage('Merge Allure Results') {
             steps {
                 echo '===== MERGING ALLURE RESULTS ====='
+
                 sh '''
                     rm -rf allure-results-all
                     mkdir -p allure-results-all
@@ -71,31 +79,46 @@ pipeline {
                     cp -R allure-results-regression/. allure-results-all/
                     cp -R allure-results-e2e/. allure-results-all/
 
-                    echo "===== ALLURE RESULTS ====="
+                    echo "===== MERGED RESULTS ====="
                     ls -la allure-results-all
                 '''
             }
         }
 
-        stage('Publish Allure Report') {
+        stage('Generate Allure Report') {
             steps {
-                echo '===== PUBLISHING ALLURE REPORT ====='
+                echo '===== GENERATING ALLURE REPORT ====='
 
-                allure(
-                    includeProperties: false,
-                    jdk: '',
-                    results: [[path: 'allure-results-all']]
-                )
+                sh '''
+                    rm -rf allure-report
+
+                    allure generate allure-results-all \
+                        --clean \
+                        -o allure-report
+
+                    echo "===== ALLURE REPORT GENERATED ====="
+                    ls -la allure-report
+                '''
+            }
+        }
+
+        stage('Archive Allure Report') {
+            steps {
+                echo '===== ARCHIVING ALLURE REPORT ====='
+
+                archiveArtifacts artifacts: 'allure-report/**',
+                                 fingerprint: true
             }
         }
     }
 
     post {
+
         success {
             echo '========================================'
             echo 'PIPELINE SUCCESS'
             echo 'Smoke + Regression + E2E completed'
-            echo 'Allure Report published'
+            echo 'Allure Report generated and archived'
             echo '========================================'
         }
 
