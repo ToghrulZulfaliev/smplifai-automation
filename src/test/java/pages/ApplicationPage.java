@@ -331,33 +331,24 @@ public class ApplicationPage {
 
     public void clickChoose() {
 
-        WebElement button =
-                wait.until(
-                        ExpectedConditions.elementToBeClickable(
-                                chooseButton
-                        )
-                );
+        WebDriverWait wait =
+                new WebDriverWait(driver, Duration.ofSeconds(30));
 
+        WebElement choose =
+                wait.until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//button[contains(.,'Choose')]")
+                ));
 
-        scrollToElement(button);
+        choose.click();
 
+        System.out.println("✓ Choose düyməsinə klik edildi");
 
-        try {
-
-            button.click();
-
-        } catch (Exception e) {
-
-            jsClick(button);
-        }
-
-
-        System.out.println(
-                "✓ Choose düyməsinə klik edildi"
+        wait.until(driver ->
+                driver.findElements(
+                        By.cssSelector("input[type='file']")
+                ).size() >= 3
         );
     }
-
-
     // =========================================================
     // ENROLLMENT AGREEMENT CHECK
     // =========================================================

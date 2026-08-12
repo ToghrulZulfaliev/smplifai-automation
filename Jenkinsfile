@@ -3,7 +3,8 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        JAVA_HOME = "/Users/togrulzulfaliyev/Library/Java/JavaVirtualMachines/ms-17.0.20/Contents/Home"
+        PATH = "${JAVA_HOME}/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     }
 
     stages {
